@@ -6,46 +6,56 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
 
 public class MyCSVReader {
-	
+
 	@Autowired
 	SQLUpdate sqlUpdate;
-	
+
 	public void readCSVFile(FileReader fileReader) {
-		
+
 		sqlUpdate.createPreparedStatement();
 
-		CSVReader csvReader = new CSVReaderBuilder(fileReader).withSkipLines(1).build();
+		// CSVReader csvReader = new
+		// CSVReaderBuilder(fileReader).withSkipLines(1).build();
+		CSVReader csvReader = new CSVReader(fileReader);
 		String[] records = null;
 		int count = 0;
 		String numberType;
 		String phoneNumber;
+		int numberTypeColumn = 0;
+		int phoneNumberColumn = 0;
 
 		try {
 
+			records = csvReader.readNext();
+
+			for (int i = 0; i <= (records.length - 1); i++) {
+
+				if (records[i].equalsIgnoreCase("Phone")) {
+					phoneNumberColumn = i;
+				}
+
+				if (records[i].equalsIgnoreCase("NumberType")) {
+					numberTypeColumn = i;
+				}
+			}
+
 			while ((records = csvReader.readNext()) != null) {
-
-				if (count < 100000) {
-
-					numberType = records[11];
-					phoneNumber = records[0];
-					sqlUpdate.prepareSQLStatement(numberType, phoneNumber);
-					count++;
-
-				} else {
-					numberType = records[12];
-					phoneNumber = records[0];
-					sqlUpdate.prepareSQLStatement(numberType, phoneNumber);
+				
+				numberType = records[numberTypeColumn];
+				phoneNumber = records[phoneNumberColumn];
+				sqlUpdate.prepareSQLStatement(numberType, phoneNumber);
+				count++;
+				
+				if (count == 10000) {
 					sqlUpdate.executeSQLStatement();
 					count = 0;
-
 				}
 
 			}
-			
-			if(count != 0) {
+
+			if (count != 0) {
 				sqlUpdate.executeSQLStatement();
 			}
 
@@ -54,7 +64,7 @@ public class MyCSVReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		sqlUpdate.closePreparedStatement();
 
 	}

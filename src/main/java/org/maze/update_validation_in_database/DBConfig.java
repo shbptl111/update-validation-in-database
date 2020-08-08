@@ -33,25 +33,11 @@ public class DBConfig {
 		return connection;
 	}
 
-	/*
-	 * @Bean(name = "preparedStatement") public PreparedStatement
-	 * getPreparedStatement() { PreparedStatement preparedStatement = null; try {
-	 * Statement statement = connection.createStatement(); String sql =
-	 * "CREATE TABLE #RECORDS(MobileNo nvarchar(500), \n" +
-	 * "ContactType nvarchar(500))"; statement.execute(sql); statement.close();
-	 * preparedStatement =
-	 * connection.prepareStatement("INSERT INTO #RECORDS VALUES(?, ?)"); } catch
-	 * (SQLException e) { e.printStackTrace(); }
-	 * 
-	 * return preparedStatement; }
-	 */
-
 	@PostConstruct
 	public void createTempTable() {
 		try {
 			Statement statement = connection.createStatement();
-			String sql = "CREATE TABLE #RECORDS(MobileNo nvarchar(500), \n" + 
-			             "ContactType nvarchar(500))";
+			String sql = "CREATE TABLE #RECORDS(MobileNo nvarchar(500), \n" + "ContactType nvarchar(500))";
 			statement.execute(sql);
 			statement.close();
 		} catch (SQLException e) {
@@ -59,13 +45,13 @@ public class DBConfig {
 		}
 
 	}
-	
+
 	@PreDestroy
 	public void closeConnection() {
 		try {
 			System.out.println("Closing connection with database");
-			if(connection != null)
-			connection.close();
+			if (connection != null)
+				connection.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
