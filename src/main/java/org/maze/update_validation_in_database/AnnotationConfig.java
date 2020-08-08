@@ -8,14 +8,12 @@ public class AnnotationConfig {
 
 	@Bean(name = "myCSVReader")
 	public MyCSVReader getMyCSVReader() {
-		MyCSVReader myCSVReader = new MyCSVReader();
-		return myCSVReader;
+		return  new MyCSVReader();
 	}
 	
 	@Bean(name = "sqlUpdate")
 	public SQLUpdate getsqlUpdate() {
-		SQLUpdate sqlUpdate = new SQLUpdate();
-		return sqlUpdate;
+		return new SQLUpdate();
 	}
 	
 }

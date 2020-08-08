@@ -2,15 +2,20 @@ package org.maze.update_validation_in_database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DBConfig {
-	
+
+	@Autowired
 	private Connection connection;
 
 	@Bean(name = "databaseConnection")
@@ -21,23 +26,49 @@ public class DBConfig {
 					.getConnection("jdbc:sqlserver://localhost:1433;databaseName=students;integratedSecurity=true;");
 			connection.setAutoCommit(false);
 			System.out.println("Connection with database established");
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return connection;
 	}
-	
-	@Bean(name = "preparedStatement")
-	public PreparedStatement getPreparedStatement() {
-		PreparedStatement preparedStatement = null;
+
+	/*
+	 * @Bean(name = "preparedStatement") public PreparedStatement
+	 * getPreparedStatement() { PreparedStatement preparedStatement = null; try {
+	 * Statement statement = connection.createStatement(); String sql =
+	 * "CREATE TABLE #RECORDS(MobileNo nvarchar(500), \n" +
+	 * "ContactType nvarchar(500))"; statement.execute(sql); statement.close();
+	 * preparedStatement =
+	 * connection.prepareStatement("INSERT INTO #RECORDS VALUES(?, ?)"); } catch
+	 * (SQLException e) { e.printStackTrace(); }
+	 * 
+	 * return preparedStatement; }
+	 */
+
+	@PostConstruct
+	public void createTempTable() {
 		try {
-			preparedStatement = connection.prepareStatement("UPDATE TestTable SET ContactType = ? WHERE MobileNo = ?");
+			Statement statement = connection.createStatement();
+			String sql = "CREATE TABLE #RECORDS(MobileNo nvarchar(500), \n" + 
+			             "ContactType nvarchar(500))";
+			statement.execute(sql);
+			statement.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return preparedStatement;
+
 	}
+	
+	@PreDestroy
+	public void closeConnection() {
+		try {
+			System.out.println("Closing connection with database");
+			if(connection != null)
+			connection.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

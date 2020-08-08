@@ -14,6 +14,8 @@ public class MyCSVReader {
 	SQLUpdate sqlUpdate;
 	
 	public void readCSVFile(FileReader fileReader) {
+		
+		sqlUpdate.createPreparedStatement();
 
 		CSVReader csvReader = new CSVReaderBuilder(fileReader).withSkipLines(1).build();
 		String[] records = null;
@@ -25,7 +27,7 @@ public class MyCSVReader {
 
 			while ((records = csvReader.readNext()) != null) {
 
-				if (count < 100) {
+				if (count < 100000) {
 
 					numberType = records[11];
 					phoneNumber = records[0];
@@ -33,10 +35,10 @@ public class MyCSVReader {
 					count++;
 
 				} else {
-					numberType = records[11];
+					numberType = records[12];
 					phoneNumber = records[0];
 					sqlUpdate.prepareSQLStatement(numberType, phoneNumber);
-					sqlUpdate.executeSQLStatement(true);
+					sqlUpdate.executeSQLStatement();
 					count = 0;
 
 				}
@@ -44,7 +46,7 @@ public class MyCSVReader {
 			}
 			
 			if(count != 0) {
-				sqlUpdate.executeSQLStatement(true);
+				sqlUpdate.executeSQLStatement();
 			}
 
 			csvReader.close();
@@ -52,6 +54,8 @@ public class MyCSVReader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		sqlUpdate.closePreparedStatement();
 
 	}
 

@@ -8,10 +8,12 @@ import java.util.Scanner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class App {
-	
+
 	static AnnotationConfigApplicationContext context;
 
 	public static void main(String[] args) {
+		long start = System.currentTimeMillis();
+		
 
 		String filePath = null;
 
@@ -27,26 +29,30 @@ public class App {
 
 		File file = new File(filePath);
 		scanFolderForCSVFiles(file);
-		
+
 		context.close();
+		long end = System.currentTimeMillis();
+		System.out.println("Total time required: " + ((end - start) / 60000) + "." + ((end-start) % 60000) + " minutes");
+		System.out.println("Total time required: " + (end - start) + " milliseconds");
+		System.out.println("===========================================");
 	}
 
 	public static void scanFolderForCSVFiles(File file) {
 		FileReader fileReader = null;
 		File[] files = file.listFiles();
-
+		
 		for (File f : files) {
-			if (f.isFile() && f.getAbsolutePath().toLowerCase().endsWith(".csv")) {
+			if(f.isDirectory()) {
+				scanFolderForCSVFiles(f);
+			}else if (f.getName().toLowerCase().endsWith(".csv")) {
 				try {
-					System.out.println("Reading " + f.getName());
-					fileReader = new FileReader(f.getAbsolutePath());
+					System.out.println("Reading " + f.getPath());
+					fileReader = new FileReader(f.getPath());
 					MyCSVReader myCSVReader = (MyCSVReader) context.getBean("myCSVReader");
 					myCSVReader.readCSVFile(fileReader);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
-			} else if (f.isDirectory()) {
-				scanFolderForCSVFiles(file);
 			}
 		}
 
