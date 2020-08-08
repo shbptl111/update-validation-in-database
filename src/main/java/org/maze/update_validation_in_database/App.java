@@ -4,17 +4,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class App {
-
+	
 	static AnnotationConfigApplicationContext context;
 
 	public static void main(String[] args) {
+
 		long start = System.currentTimeMillis();
 		
-
 		String filePath = null;
 
 		context = new AnnotationConfigApplicationContext();
@@ -32,19 +33,19 @@ public class App {
 
 		context.close();
 		long end = System.currentTimeMillis();
-		System.out.println("Total time required: " + ((end - start) / 60000) + "." + ((end-start) % 60000) + " minutes");
-		System.out.println("Total time required: " + (end - start) + " milliseconds");
-		System.out.println("===========================================");
+		System.out.println("Time required to complete program: " + 
+				+ (TimeUnit.MILLISECONDS.toMinutes(end - start)) + " minutes "
+				+ (TimeUnit.MILLISECONDS.toSeconds(end - start) % 60) + " seconds.");		
 	}
 
 	public static void scanFolderForCSVFiles(File file) {
 		FileReader fileReader = null;
 		File[] files = file.listFiles();
-		
+
 		for (File f : files) {
-			if(f.isDirectory()) {
+			if (f.isDirectory()) {
 				scanFolderForCSVFiles(f);
-			}else if (f.getName().toLowerCase().endsWith(".csv")) {
+			} else if (f.getName().toLowerCase().endsWith(".csv")) {
 				try {
 					System.out.println("Reading " + f.getPath());
 					fileReader = new FileReader(f.getPath());
